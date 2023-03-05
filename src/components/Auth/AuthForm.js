@@ -1,18 +1,54 @@
-import { useState, useRef } from "react";
-
+import { useState, useRef, useContext } from "react";
+import NoteContext from '../../store/context'
 import classes from "./AuthForm.module.css";
 
 const AuthForm = () => {
+  const AuthContext=useContext(NoteContext)
+
   const [isLogin, setIsLogin] = useState(true);
-  const [isLoading,setLoading]=useState(false)
+  const [isLoading, setLoading] = useState(false);
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const submitHandler = (e) => {
     e.preventDefault();
     const emailEntered = emailInputRef.current.value;
     const passwordEntered = passwordInputRef.current.value;
-       setLoading(true)
+    
+    setLoading(true);
     if (isLogin) {
+      fetch(
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyATIKSUGO-VOInVAzf2pwNXWquajj3hm_8",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: emailEntered,
+            password: passwordEntered,
+            returnSecureToken: true,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((res)=>{
+        setLoading(false)
+        if(res.ok){
+          return res.json().then((data)=>{
+            // console.log(data.idToken)
+            AuthContext.login(data.idToken)
+            
+          })
+
+        }else{
+          return res.json().then((data)=>{
+            let errorMessage = "Authentication Failed";
+            if (data && data.error && data.error.message) {
+              errorMessage = data.error.message;
+            }
+            alert(errorMessage);
+
+          })
+        }
+      })
     } else {
       fetch(
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyATIKSUGO-VOInVAzf2pwNXWquajj3hm_8",
@@ -29,8 +65,9 @@ const AuthForm = () => {
         }
       ).then((res) => {
         //..
-        setLoading(false)
+        setLoading(false);
         if (res.ok) {
+
         } else {
           return res.json().then((data) => {
             let errorMessage = "Authentication Failed";
@@ -66,7 +103,11 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.actions}>
-         {!isLoading?<button> {isLogin ? "Login" : "Create Acount"}</button>:<p>Sending request...</p>} 
+          {!isLoading ? (
+            <button> {isLogin ? "Login" : "Create Acount"}</button>
+          ) : (
+            <p>Sending request...</p>
+          )}
           <button
             type="button"
             className={classes.toggle}
