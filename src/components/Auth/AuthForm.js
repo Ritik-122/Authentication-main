@@ -37,6 +37,7 @@ const AuthForm = () => {
           return res.json().then((data) => {
             // console.log(data.idToken)
             AuthContext.login(data.idToken);
+            localStorage.setItem("idToken",data.idToken)
             history.replace("/");
           });
         } else {

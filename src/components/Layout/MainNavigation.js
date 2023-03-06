@@ -10,6 +10,7 @@ const MainNavigation = () => {
   const isLoggedIn=AuthContext.isLoggedIn
   const LogOutHandler=()=>{
     AuthContext.logout()
+    localStorage.clear()
      history.replace('/')
   }
   return (

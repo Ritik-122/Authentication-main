@@ -3,7 +3,9 @@ import NoteContext from "./context";
 
 const ContextProvider = (props) => {
   const [token, setToken] = useState(null);
-  const userIsLoggedIn = !!token;
+  let userIsLoggedIn =  localStorage.getItem('idToken') ? true:false;
+  
+
   const loginHandler = (token) => {
     setToken(token);
   };
